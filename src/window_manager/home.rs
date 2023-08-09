@@ -19,6 +19,7 @@ impl Home {
 					self.selected_file = Some(
 						native_dialog::FileDialog::new()
 							.add_filter("Vromf file", &["bin"])
+							.set_location(&home::home_dir().unwrap())
 							.show_open_single_file()
 							.unwrap()
 							.unwrap()

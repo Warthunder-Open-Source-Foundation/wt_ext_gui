@@ -3107,6 +3107,7 @@ version = "0.1.0"
 dependencies = [
  "color-eyre",
  "eframe",
+ "home",
  "native-dialog",
  "open",
  "rayon",
