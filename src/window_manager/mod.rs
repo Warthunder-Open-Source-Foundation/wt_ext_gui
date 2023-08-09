@@ -1,4 +1,6 @@
 use eframe::egui;
+use crate::App;
+use crate::config::Configuration;
 
 use crate::window_manager::home::Home;
 
@@ -10,10 +12,10 @@ pub enum Window {
 }
 
 impl Window {
-	pub fn render(&mut self, ctx: &egui::Context) {
+	pub fn render(&mut self, ctx: &egui::Context, app: &mut Configuration) {
 		match self {
 			Window::Home(home) => {
-				home.show(ctx);
+				home.show(ctx, app);
 			}
 		}
 	}
