@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use color_eyre::eyre::{bail, ContextCompat};
 use serde::{Deserialize, Serialize};
-use tracing::info;
+use tracing::{info, warn};
 
 use crate::AppResult;
 
@@ -36,6 +36,7 @@ impl Configuration {
 			Err(e) => {
 				match e.kind() {
 					ErrorKind::NotFound => {
+						warn!("Did not find configuration, created new at {}", base.to_string_lossy());
 						let mut f = fs::File::create(&base)?;
 						let default = Self {
 							previously_opened_files: vec![],
