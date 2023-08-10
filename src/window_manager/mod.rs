@@ -1,10 +1,11 @@
 use std::path::PathBuf;
+use std::sync::{Arc, Mutex, RwLock};
 use eframe::egui;
 use crate::{App, AppResult};
 use crate::config::Configuration;
 
 use crate::window_manager::home::Home;
-use crate::window_manager::view::View;
+use crate::window_manager::view::{ActiveTask, View};
 
 pub mod home;
 pub mod view;
@@ -20,6 +21,9 @@ impl WindowChange {
 			Window::View(
 				View {
 					opened_path: path,
+					raw_view: None,
+					active_task: Arc::new(RwLock::new(ActiveTask::Idle)),
+					file_reader_thread: None,
 				}
 			)
 		)

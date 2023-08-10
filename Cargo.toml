@@ -16,7 +16,7 @@ wt_blk = { git = "https://github.com/Warthunder-Open-Source-Foundation/wt_blk" }
 #wt_blk = {path = "../wt_blk"}
 thiserror = "^1.0"
 rayon = "^1.7.0"
-open = "^4"
+open = "5.0.0"
 native-dialog = "0.6.4"
 color-eyre = { version = "^0.6", default-features = false }
 
