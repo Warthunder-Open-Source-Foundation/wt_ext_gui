@@ -7,6 +7,7 @@ use std::thread::JoinHandle;
 
 use color_eyre::Report;
 use eframe::egui;
+use eframe::egui::ScrollArea;
 use tracing::info;
 use wt_blk::blk::BlkOutputFormat;
 use wt_blk::vromf::unpacker::{File, VromfUnpacker};
@@ -91,7 +92,15 @@ impl View {
 			ui.small(format!("{}", self.active_task.read().unwrap()));
 			Ok::<_, Report>(())
 		}).inner?;
-		egui::CentralPanel::default().show(ctx, |ui| {});
+		egui::CentralPanel::default().show(ctx, |ui| {
+			if let Some(files) = &self.unpacked_files {
+				ScrollArea::vertical().show(ui,|ui|{
+					for file in files {
+						ui.label(file.0.to_string_lossy());
+					}
+				});
+			}
+		});
 		Ok(WindowChange::LeaveUnchanged)
 	}
 }
