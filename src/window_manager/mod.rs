@@ -24,6 +24,9 @@ impl WindowChange {
 					raw_view: None,
 					active_task: Arc::new(RwLock::new(ActiveTask::Idle)),
 					file_reader_thread: None,
+					unpack_progress: Default::default(),
+					unpacked_files: None,
+					unpacked_files_thread: None,
 				}
 			)
 		)

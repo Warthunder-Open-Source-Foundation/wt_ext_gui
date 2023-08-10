@@ -7,9 +7,8 @@ edition = "2021"
 
 [profile.release]
 opt-level = 3
-lto = true
-strip = true
-codegen-units = 4
+lto = "thin"
+codegen-units = 16
 
 [dependencies]
 wt_blk = { git = "https://github.com/Warthunder-Open-Source-Foundation/wt_blk" }
