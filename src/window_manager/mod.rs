@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use eframe::egui;
 use crate::{App, AppResult};
 use crate::config::Configuration;
@@ -11,6 +12,18 @@ pub mod view;
 pub enum WindowChange {
 	ChangeTo(Window),
 	LeaveUnchanged,
+}
+
+impl WindowChange {
+	pub fn view_with_path(path: PathBuf) -> Self {
+		Self::ChangeTo(
+			Window::View(
+				View {
+					opened_path: path,
+				}
+			)
+		)
+	}
 }
 
 
