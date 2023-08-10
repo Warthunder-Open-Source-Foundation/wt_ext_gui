@@ -1,4 +1,6 @@
 use std::path::PathBuf;
+use color_eyre::eyre::ContextCompat;
+use color_eyre::Report;
 
 use eframe::egui;
 use eframe::egui::{Align, Context, Layout};
@@ -10,7 +12,7 @@ pub struct Home {
 }
 
 impl Home {
-	pub fn show(&mut self, ctx: &Context, app: &mut Configuration) {
+	pub fn show(&mut self, ctx: &Context, app: &mut Configuration) -> AppResult<()> {
 		egui::CentralPanel::default().show(ctx, |ui| {
 			ui.heading("Home");
 			ui.label(self.selected_file.clone().unwrap_or(Default::default()).to_string_lossy().to_string());
@@ -24,21 +26,23 @@ impl Home {
 								.add_filter("Vromf file", &["bin"])
 								.set_location(&dirs::home_dir().unwrap())
 								.show_open_single_file()
-								.unwrap()
-								.unwrap()
+								?.context("No file selected")?
 						);
 						if let Some(prev) = &self.selected_file {
 							app.previously_opened_files.push(prev.to_owned());
-							app.save().unwrap();
+							app.save()?;
 						}
 					};
+					Ok::<(), Report>(())
 				}
-			);
+			).inner?;
 			ui.label("Recently opened");
 			for previously_opened_file in &app.previously_opened_files {
 				let _ = ui.button(previously_opened_file.to_string_lossy().to_string());
 			}
-		});
+			Ok::<(), Report>(())
+		}).inner?;
+		Ok(())
 	}
 }
 
