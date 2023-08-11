@@ -1,5 +1,6 @@
 use std::{fs, thread};
 use std::fmt::{Display, Formatter};
+use std::ops::Deref;
 use std::path::PathBuf;
 use std::sync::{Arc, RwLock};
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -7,13 +8,14 @@ use std::thread::JoinHandle;
 
 use color_eyre::Report;
 use eframe::egui;
-use eframe::egui::ScrollArea;
+use eframe::egui::{ProgressBar, ScrollArea};
 use tracing::info;
 use wt_blk::blk::BlkOutputFormat;
 use wt_blk::vromf::unpacker::{File, VromfUnpacker};
 
 use crate::AppResult;
 use crate::config::Configuration;
+use crate::window_manager::view::ActiveTask::UnpackingVromf;
 use crate::window_manager::WindowChange;
 
 pub struct View {
@@ -46,6 +48,18 @@ impl View {
 			Ok::<_, Report>(())
 		}).inner?;
 		egui::CentralPanel::default().show(ctx, |ui| {
+			match self.active_task.read().unwrap().deref() {
+				UnpackingVromf { left, total } => {
+					ui.add(
+						ProgressBar::new(
+							((*total - *left) as f32 / *total as f32)
+						)
+							.show_percentage()
+							.text("Unpacking vromf")
+					);
+				}
+				_ => {}
+			}
 			if let Some(files) = &self.unpacked_files {
 				ScrollArea::vertical().show(ui, |ui| {
 					for file in files {
