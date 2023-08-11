@@ -1,6 +1,10 @@
+use std::fs;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, RwLock};
 use eframe::egui;
+use eframe::egui::{ColorImage, Context};
+use image::{DynamicImage, GenericImageView, ImageFormat};
+use image::imageops::{FilterType, resize, thumbnail};
 use crate::{App, AppResult};
 use crate::config::Configuration;
 
@@ -16,7 +20,9 @@ pub enum WindowChange {
 }
 
 impl WindowChange {
-	pub fn view_with_path(path: PathBuf) -> Self {
+	pub fn view_with_path(path: PathBuf, ctx: &Context) -> Self {
+		let mut img = image::load_from_memory(&fs::read("/home/flareflo/Downloads/8750719.png").unwrap()).unwrap();
+		img = thumbnail(&img,32,32).into();
 		Self::ChangeTo(
 			Window::View(
 				View {
@@ -27,6 +33,7 @@ impl WindowChange {
 					unpack_progress: Default::default(),
 					unpacked_files: None,
 					unpacked_files_thread: None,
+					icon: ctx.load_texture("binary-icon", ColorImage::from_rgba_unmultiplied([img.width() as _, img.height() as _], img.as_bytes()), Default::default()),
 				}
 			)
 		)

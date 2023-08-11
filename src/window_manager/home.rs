@@ -31,7 +31,7 @@ impl Home {
 							app.previously_opened_files.push(prev.to_owned());
 							app.previously_opened_files.dedup();
 							app.save()?;
-							return Ok(WindowChange::view_with_path(prev.clone()));
+							return Ok(WindowChange::view_with_path(prev.clone(), ctx));
 						}
 					};
 					Ok::<_, Report>(WindowChange::LeaveUnchanged)
@@ -40,7 +40,7 @@ impl Home {
 			ui.label("Recently opened");
 			for previously_opened_file in &app.previously_opened_files {
 				if ui.button(previously_opened_file.to_string_lossy().to_string()).clicked() {
-					ret =  WindowChange::view_with_path(previously_opened_file.clone());
+					ret =  WindowChange::view_with_path(previously_opened_file.clone(), ctx);
 				}
 			}
 			Ok(ret)

@@ -3172,6 +3172,7 @@ dependencies = [
  "dirs",
  "eframe",
  "egui_extras",
+ "image",
  "native-dialog",
  "open",
  "rayon",

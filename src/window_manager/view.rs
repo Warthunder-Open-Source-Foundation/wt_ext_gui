@@ -37,6 +37,8 @@ pub struct View {
 	/// Final unpacked files
 	pub unpacked_files: Option<Vec<File>>,
 	pub unpacked_files_thread: Option<JoinHandle<Result<Vec<File>, Report>>>,
+
+	pub(crate) icon: egui::TextureHandle,
 }
 
 impl View {
@@ -61,9 +63,14 @@ impl View {
 				_ => {}
 			}
 			if let Some(files) = &self.unpacked_files {
-				ScrollArea::vertical().show(ui, |ui| {
+				ScrollArea::vertical()
+					.auto_shrink([false,false])
+					.show(ui, |ui| {
 					for file in files {
-						ui.label(file.0.to_string_lossy());
+						ui.horizontal(|ui|{
+							ui.image(&self.icon, self.icon.size_vec2());
+							ui.label(file.0.to_string_lossy());
+						});
 					}
 				});
 			}
