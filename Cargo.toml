@@ -30,3 +30,4 @@ serde = { version = "^1.0", features = ["serde_derive"] }
 eframe = "0.22.0"
 toml = "0.7.6"
 dirs = "5.0.1"
+egui_extras = "0.22.0"
