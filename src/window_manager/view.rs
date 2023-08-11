@@ -1,5 +1,5 @@
-use std::fmt::{Display, Formatter};
 use std::{fs, thread};
+use std::fmt::{Display, Formatter};
 use std::path::PathBuf;
 use std::sync::{Arc, RwLock};
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -39,6 +39,25 @@ pub struct View {
 
 impl View {
 	pub fn show(&mut self, ctx: &egui::Context, app: &mut Configuration) -> AppResult<WindowChange> {
+		self.read_file()?;
+		self.parse_vromfs()?;
+		egui::TopBottomPanel::bottom("footer").show(ctx, |ui| {
+			ui.small(format!("{}", self.active_task.read().unwrap()));
+			Ok::<_, Report>(())
+		}).inner?;
+		egui::CentralPanel::default().show(ctx, |ui| {
+			if let Some(files) = &self.unpacked_files {
+				ScrollArea::vertical().show(ui, |ui| {
+					for file in files {
+						ui.label(file.0.to_string_lossy());
+					}
+				});
+			}
+		});
+		Ok(WindowChange::LeaveUnchanged)
+	}
+
+	fn read_file(&mut self) -> AppResult<()> {
 		if self.raw_view.is_none() {
 			if let Some(handle) = self.file_reader_thread.take() {
 				if handle.is_finished() {
@@ -67,15 +86,18 @@ impl View {
 				self.file_reader_thread = Some(t);
 			}
 		}
+		Ok(())
+	}
+	fn parse_vromfs(&mut self) -> AppResult<()> {
 		if self.unpacked_files.is_none() && let Some(vromf) = self.raw_view.clone() {
 			*self.active_task.write().unwrap() = ActiveTask::UnpackingVromf { left: self.unpack_progress.0.load(Ordering::Relaxed), total: self.unpack_progress.1.load(Ordering::Relaxed) };
 			if let Some(t) = self.unpacked_files_thread.take() {
-					if t.is_finished() {
-						self.unpacked_files = Some(t.join().unwrap()?);
-						self.active_task.write().unwrap().idle();
-					} else {
-						self.unpacked_files_thread = Some(t);
-					}
+				if t.is_finished() {
+					self.unpacked_files = Some(t.join().unwrap()?);
+					self.active_task.write().unwrap().idle();
+				} else {
+					self.unpacked_files_thread = Some(t);
+				}
 			} else {
 				info!("Spawn vromf unpacking thread");
 				let path = self.opened_path.clone();
@@ -87,21 +109,7 @@ impl View {
 				self.unpacked_files_thread = Some(t);
 			}
 		}
-
-		egui::TopBottomPanel::bottom("footer").show(ctx, |ui| {
-			ui.small(format!("{}", self.active_task.read().unwrap()));
-			Ok::<_, Report>(())
-		}).inner?;
-		egui::CentralPanel::default().show(ctx, |ui| {
-			if let Some(files) = &self.unpacked_files {
-				ScrollArea::vertical().show(ui,|ui|{
-					for file in files {
-						ui.label(file.0.to_string_lossy());
-					}
-				});
-			}
-		});
-		Ok(WindowChange::LeaveUnchanged)
+		Ok(())
 	}
 }
 
